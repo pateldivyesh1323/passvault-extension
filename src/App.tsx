@@ -8,7 +8,7 @@ import Passwords from "./pages/Passwords";
 
 function App() {
     return (
-        <div className="w-[350px] h-[550px] bg-neutral-900 text-white text-sm font-sans">
+        <div className="w-[350px] h-[550px] bg-neutral-900 text-white text-sm font-sans overflow-y-auto">
             <Navbar />
             <Routes>
                 <Route path="/" element={<Home />} />

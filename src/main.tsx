@@ -6,6 +6,7 @@ import { HashRouter } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 import environment from "./environment.ts";
 import { UserAuthProvider } from "./providers/UserAuthProvider.tsx";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 createRoot(document.getElementById("passvault-extension-root")!).render(
     <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById("passvault-extension-root")!).render(
             >
                 <UserAuthProvider>
                     <App />
+                    <Toaster />
                 </UserAuthProvider>
             </Auth0Provider>
         </HashRouter>
