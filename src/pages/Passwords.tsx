@@ -11,7 +11,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Loader } from "lucide-react";
+import { Eye, Loader, Trash2 } from "lucide-react";
 
 export default function Passwords() {
     const { getAccessToken } = useUserAuth();
@@ -37,13 +37,13 @@ export default function Passwords() {
     }, [fetchPasswords]);
 
     return (
-        <div className="overflow-hidden w-[95vw] mx-auto p-4 rounded-lg border border-neutral-700">
+        <div className="overflow-hidden w-[95vw] mx-auto p-4 border-neutral-700">
             {isLoading ? (
                 <div className="flex justify-center items-center gap-2">
                     <Loader className="animate-spin" /> Loading Passwords.....
                 </div>
             ) : (
-                <Table className="min-w-full text-left h-fit border-separate border-spacing-0">
+                <Table className="text-left h-fit border-separate border-spacing-0">
                     <TableCaption>Your Passwords</TableCaption>
                     <TableHead className="bg-neutral-800">
                         <TableRow>
@@ -55,8 +55,22 @@ export default function Passwords() {
                     <TableBody>
                         {passwords.map((password) => (
                             <TableRow key={password._id}>
-                                <TableCell className="text-neutral-200 border border-neutral-700 cursor-pointer">
-                                    {password.name}
+                                <TableCell className="text-neutral-200 border border-neutral-700 cursor-pointer group">
+                                    <div className="flex justify-between items-center">
+                                        <span className="overflow-hidden whitespace-nowrap truncate w-[100%] group-hover:w-[80%] transition-all">
+                                            {password.name}
+                                        </span>
+                                        <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Eye
+                                                className="h-4 w-4"
+                                                fill="neutral-200"
+                                            />
+                                            <Trash2
+                                                className="h-4 w-4"
+                                                fill="neutral-200"
+                                            />
+                                        </div>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}
