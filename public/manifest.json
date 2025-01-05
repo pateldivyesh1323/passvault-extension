@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "My Vite React Chrome Extension",
+    "name": "Passvault",
     "version": "1.0",
-    "description": "A Chrome extension built with Vite and React.",
+    "description": "A Chrome extension to store your passwords securely. Uses Passvault API to store your passwords.",
     "action": {
         "default_popup": "index.html"
     },

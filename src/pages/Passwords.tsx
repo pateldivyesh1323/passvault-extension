@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { deletePassword, getPasswords } from "@/queries";
+import { createPassword, deletePassword, getPasswords } from "@/queries";
 import { PassInterface } from "@/types";
 import { useUserAuth } from "@/providers/UserAuthProvider";
 import {
@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Eye, Loader, Trash2 } from "lucide-react";
+import { Eye, Loader, PlusCircle, Trash2 } from "lucide-react";
 import {
     Dialog,
     DialogClose,
@@ -22,12 +22,18 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Passwords() {
     const { getAccessToken } = useUserAuth();
 
     const [passwords, setPasswords] = useState<PassInterface[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [createPasswordForm, setCreatePasswordForm] = useState({
+        name: "",
+        password: "",
+        encryptionKey: "",
+    });
 
     const fetchPasswords = useCallback(async () => {
         try {
@@ -42,9 +48,48 @@ export default function Passwords() {
         }
     }, [getAccessToken]);
 
+    const handleCreatePasswordFormChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setCreatePasswordForm({
+            ...createPasswordForm,
+            [e.target.name]: e.target.value,
+        });
+    };
+
     useEffect(() => {
         fetchPasswords();
     }, [fetchPasswords]);
+
+    const handleCreatePassword = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
+        e.preventDefault();
+        try {
+            const { name, password, encryptionKey } = createPasswordForm;
+            if (!name || !password || !encryptionKey) {
+                toast.error("Please fill all fields");
+                return;
+            }
+            const token = await getAccessToken();
+            const data = await createPassword({
+                token,
+                name,
+                password,
+                encryptionKey,
+            });
+            toast.success(data?.message || "Password created successfully");
+            fetchPasswords();
+            setCreatePasswordForm({
+                name: "",
+                password: "",
+                encryptionKey: "",
+            });
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong");
+        }
+    };
 
     const handleDeletePassword = async (id: string) => {
         try {
@@ -72,9 +117,68 @@ export default function Passwords() {
                                 Your Passwords
                             </TableCell>
                             <TableCell className="font-semibold">
-                                <Button variant="outline" color="white">
-                                    Create
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <Button
+                                            variant="outline"
+                                            color="white"
+                                            className="flex items-center gap-2"
+                                        >
+                                            <PlusCircle className="h-4 w-4" />
+                                            Create
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="w-[95%]">
+                                        <DialogHeader>
+                                            <DialogTitle className="mb-4">
+                                                Create new password
+                                            </DialogTitle>
+                                            <form
+                                                onSubmit={handleCreatePassword}
+                                                className="flex flex-col gap-2"
+                                            >
+                                                <Input
+                                                    placeholder="Name"
+                                                    type="text"
+                                                    name="name"
+                                                    value={
+                                                        createPasswordForm.name
+                                                    }
+                                                    onChange={
+                                                        handleCreatePasswordFormChange
+                                                    }
+                                                />
+                                                <Input
+                                                    placeholder="Password"
+                                                    type="password"
+                                                    name="password"
+                                                    value={
+                                                        createPasswordForm.password
+                                                    }
+                                                    onChange={
+                                                        handleCreatePasswordFormChange
+                                                    }
+                                                />
+                                                <Input
+                                                    placeholder="Decryption Key: Remember this key"
+                                                    type="password"
+                                                    name="encryptionKey"
+                                                    value={
+                                                        createPasswordForm.encryptionKey
+                                                    }
+                                                    onChange={
+                                                        handleCreatePasswordFormChange
+                                                    }
+                                                />
+                                                <DialogClose asChild>
+                                                    <Button type="submit">
+                                                        Create
+                                                    </Button>
+                                                </DialogClose>
+                                            </form>
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
                             </TableCell>
                         </TableRow>
                     </TableHead>
@@ -120,11 +224,11 @@ export default function Passwords() {
                                                 </DialogTrigger>
                                                 <DialogContent className="w-[80%]">
                                                     <DialogHeader>
-                                                        <DialogDescription>
+                                                        <DialogTitle>
                                                             Are you sure you
                                                             want to delete the
                                                             password?
-                                                        </DialogDescription>
+                                                        </DialogTitle>
                                                     </DialogHeader>
                                                     <DialogFooter>
                                                         <DialogClose asChild>
